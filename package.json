@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/willmhowes/willmhowes.github.io#readme",
   "dependencies": {
+    "jquery": "^3.4.1",
     "startbootstrap-one-page-wonder": "^5.0.4"
   }
 }
