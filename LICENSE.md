@@ -1,3 +1,5 @@
+For zola-theme-terminimal:
+
 MIT License
 
 Copyright (c) 2019 Paweł Romanowski
