@@ -13,17 +13,17 @@ It turns out that in my rush to get a blog up, I failed to properly survey the w
 
 # Static sites are free
 
-If all you want to do if serve some HTML files to the rest of the world, there seem to limitless providers foaming at the mouth to do it for free. GitHub Pages, Cloudflare Pages, etc. I reckon I might go with Cloudflare pages because Cloudflare [seems to support privacy](https://1.1.1.1/) and is apparently very fast.
+If all you want to do if serve some HTML files to the rest of the world, there seem to limitless providers foaming at the mouth to do it for free. GitHub Pages, Cloudflare Pages, etc. I reckon I might go with Cloudflare pages because Cloudflare [seems to support privacy](https://1.1.1.1/) and is apparently very fast. I'm currently paying DreamHost for a lot more functionality than I'm actually using, so making the switch here is no brainer.
 
 # So who needs paid hosting?
 
-Anybody who is doing more than serving static files. So, for example, any website that needs a website or any web application. But for the purposes of hosting a static blog, I don't need to be paying DreamHost a monthly hosting fee. And if I was going to go with a webhost in the future, it would be
+Anybody who is doing more than serving static files. So, for example, a website with a backend, a web application, or someone who needs more fine-grained control over the system they are running. But for the purposes of hosting a static blog, I don't need to be paying DreamHost a monthly hosting fee. And if I was going to go with a webhost in the future, it would be
 
 # [NearlyFreeSpeech.NET](https://www.nearlyfreespeech.net/) (NFSN)
 
-The self-described "the masters of [only pay for what you use](https://www.nearlyfreespeech.net/services/pricing) hosting", NFSN is likely one of the most economical hosts around. They would be great for some of the following projects I'm interested in:
+The self-described "masters of [only pay for what you use](https://www.nearlyfreespeech.net/services/pricing) hosting", NFSN is likely one of the most economical hosts around. Plus, you actually have control over the root directory, [something DreamHost doesn't allow](https://willm.how/blog/site-notes). NFSN would be great for some of the following projects I'm interested in:
 
-- Quote blog, someting aking to [this](https://qblog.aaronsw.com/). The Google Keep note just isn't cutting anymore.
+- Quote blog, someting aking to [this](https://qblog.aaronsw.com/). My Google Keep note just isn't cutting anymore.
 - Hosting [some sort of comment system.](https://lisakov.com/projects/open-source-comments/)
 - [Hosting a Gitea](https://www.r-bloggers.com/2019/12/git-hosting-for-the-distraught-and-the-restless/)?
 
@@ -36,7 +36,7 @@ I don't NEED any of these things, but hosting at NFSN would provide an opportuni
 As best as I can tell, DreamHost provides DNS management for any domains I purchase through them. So the tentative plan going forward is as follows:
 
 1. Starting hosting my static blog at blog.willm.how via Cloudflare Pages (free!)
-   1. The added benefit to this is that my static site generator appears to have [great support](https://www.getzola.org/documentation/deployment/cloudflare-pages/) for Cloudflare Pages
+   1. The added benefit to this is that my static site generator appears to have [good support](https://www.getzola.org/documentation/deployment/cloudflare-pages/) for Cloudflare Pages
 1. Spin up a NFSN server for the hosting a comment system and anything else that comes up
 1. Continue using DreamHost as my domain registrar and complimentary DNS provider
 
