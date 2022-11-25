@@ -1,5 +1,5 @@
 +++
-title = "Web hosting is a racket"
+title = "Web Hosting Is a Racket"
 date = 2022-11-25
 
 [taxonomies]
@@ -27,7 +27,7 @@ The self-described "masters of [only pay for what you use](https://www.nearlyfre
 - Hosting [some sort of comment system.](https://lisakov.com/projects/open-source-comments/)
 - [Hosting a Gitea](https://www.r-bloggers.com/2019/12/git-hosting-for-the-distraught-and-the-restless/)?
 
-I don't NEED any of these things, but hosting at NFSN would provide an opportunity to practice server management. Even though they don't seem to support Docker, I could try [aviary.sh](https://github.com/frameable/aviary.sh) or even better, my friend Noah's [FetchApply](https://github.com/P5vc/FetchApply)* (that is, if he ever pushes the 2.0 update to his as-yet-to-be-released Gitea).
+I don't NEED any of these things, but hosting projects with NFSN would provide an opportunity to practice server management. Even though they don't seem to support Docker, I could try [aviary.sh](https://github.com/frameable/aviary.sh) or even better, my friend Noah's [FetchApply](https://github.com/P5vc/FetchApply)* (that is, if he ever pushes the 2.0 update to his as-yet-to-be-released Gitea).
 
 *This link to FetchyApply is current as of now, but it is not the destination for future updates
 
