@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Will Howes</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://willm.how/blog/style.css">
+    <link rel="stylesheet" href="https://willm.how/blog/color/blue.css">
+
+    <link rel="stylesheet" href="https://willm.how/blog/font-hack-subset.css">
+
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://willm.how/blog" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            willm.how
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://willm.how/blog">blog</a></li>
+            
+                <li><a href="https://willm.how/blog/tags">tags</a></li>
+            
+                <li><a href="https://willm.how/blog/archive">archive</a></li>
+            
+                <li><a href="https://willm.how/blog/about">about me</a></li>
+            
+                <li><a href="https://github.com/willmhowes" target="_blank" rel="noopener noreferrer">github</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+        <div class="posts">
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://willm.how/blog/thoughts-2022-11-06/">Thesis Thoughts: Brain Dump</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-11-06
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis/">#thesis</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis-thoughts/">#thesis-thoughts</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/rust/">#rust</a></span>
+    
+
+                    
+        <div class="post-content">
+            <p>Dylan ordered a Pico for me from URS Electronics Inc in Portland. Thank you Dylan and thank you local electronics shop. There are such dramatic stock issues with normal RPs that the guy on the phone didn't even know what were talking about.</p>
+<p>Here is a dump of a bunch of sources I've been safely storing in open tabs inside three or four different private windows. These are not necessarily presented in the order they were found, but are loosely grouped together by subject.</p>
+<p>I watched a number of Modern Vintage Gamer videos, hoping to spark imagination on the topic of emulation and hardware design. This one was a standout: <a href="https://www.youtube.com/watch?v=x8PYE8A-WEw">https://www.youtube.com/watch?v=x8PYE8A-WEw</a>. This brough to me to this article -<a href="https://hackaday.com/2010/01/20/nes-console-to-cartridge-security-in-depth/">https://www.youtube.com/watch?v=x8PYE8A-WEw</a> - which then brought me to this blogpost - <a href="https://hackmii.com/2010/01/the-weird-and-wonderful-cic/">https://hackmii.com/2010/01/the-weird-and-wonderful-cic/</a> -  about CIC hacking. I wondered if that would be something that has been emulated before, or would need emulating in an emulator? Then I googled what BIOS where to figure out if the NES had them, or what kinds of consoles had them - <a href="https://en.wikipedia.org/wiki/BIOS">https://en.wikipedia.org/wiki/BIOS</a>. (I'm not sure where I read this, probably the NES dev wiki, but I found that the NES boots by looking at a specific address on the cartridge and bootstrapping everything from there).</p>
+<p>I got a little nervous about running Rust code on the PICO because the RP2040 wiki claims native Rust support but the source it links to does not - <a href="https://en.wikipedia.org/wiki/RP2040">https://en.wikipedia.org/wiki/RP2040</a>. However, there is what appears to be a mature Rust library for the Pico and other RP2040 microcontrollers - <a href="https://github.com/rp-rs">https://github.com/rp-rs</a>. And there are tutorials to get started on development using this stack - <a href="https://reltech.substack.com/p/getting-started-with-rust-on-a-raspberry">https://reltech.substack.com/p/getting-started-with-rust-on-a-raspberry</a>. And people are taking the Pico to extremes with overclocking - <a href="https://www.hackster.io/news/robin-grosset-takes-a-raspberry-pi-pico-s-rp2040-to-new-heights-with-an-overclock-to-420mhz-c3677aa5daac">https://www.hackster.io/news/robin-grosset-takes-a-raspberry-pi-pico-s-rp2040-to-new-heights-with-an-overclock-to-420mhz-c3677aa5daac</a> (even if the memory controller stops working). And most fascinating was an emulator I discovered that had been ported to the PICO which utilized multithreading to split computation/graphics, though perhaps in a different way than I intend to - <a href="https://www.hackster.io/news/graham-sanderson-turns-the-raspberry-pi-pico-other-rp2040-boards-into-a-vintage-acorn-bbc-micro-034c078a6a9a">https://www.hackster.io/news/graham-sanderson-turns-the-raspberry-pi-pico-other-rp2040-boards-into-a-vintage-acorn-bbc-micro-034c078a6a9a</a>. Here is the code for that emulator - <a href="https://github.com/kilograham/b-em">https://github.com/kilograham/b-em</a>. Then I realized I had to learn more about the different between concurrent computing and parallel computing after skimming the parallel computing wikipedia page - <a href="https://en.wikipedia.org/wiki/Parallel_computing">https://en.wikipedia.org/wiki/Parallel_computing</a>.</p>
+<p>There are other micocontroller emulators, even for the NES - <a href="https://www.hackster.io/news/a-tiny-esp32-handheld-nes-emulator-ed67168d259e">https://www.hackster.io/news/a-tiny-esp32-handheld-nes-emulator-ed67168d259e</a>. This one seems to use a micocontroller of similar specs to the PICO albeit with a higher frequency CPU - <a href="http://www.lilygo.cn/prod_view.aspx?TypeId=50063&amp;Id=1300&amp;FId=t3:50063:3">http://www.lilygo.cn/prod_view.aspx?TypeId=50063&amp;Id=1300&amp;FId=t3:50063:3</a> - though I believe the PICO can be safely overclocked to match it based on the overclocking article above (i.e. the PICO overclock would be within the limits of it's own memory controller).</p>
+<p>In seeking out of microcontroller-based NES emulators, I discovered two notable examples: <a href="https://hackaday.io/project/158797-nes-emulator-2-for-the-pic32mz-ef">https://hackaday.io/project/158797-nes-emulator-2-for-the-pic32mz-ef</a> and <a href="https://atmega32-avr.com/nes-emulation-using-atmega32/">https://atmega32-avr.com/nes-emulation-using-atmega32/</a>, the latter having a more complete write-up here - <a href="https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/s2009/bhp7_teg25/bhp7_teg25/index.html">https://people.ece.cornell.edu/land/courses/ece4760/FinalProjects/s2009/bhp7_teg25/bhp7_teg25/index.html</a>. Here is a PICO emulating the 6502 - <a href="https://www.tomshardware.com/news/pico-powered-6502-loderunner">https://www.tomshardware.com/news/pico-powered-6502-loderunner</a>.</p>
+<p>This guy on Quora helped me determine the difference in emulating an NES vs an Atari 2600 - <a href="https://qr.ae/pv3F9Q">https://qr.ae/pv3F9Q</a></p>
+<p>Here was a document on getting video out of the PICO - <a href="https://picockpit.com/raspberry-pi/raspberry-pi-pico-video-output/">https://picockpit.com/raspberry-pi/raspberry-pi-pico-video-output/</a>. It seems to make use of the PICO's PIO, but I have to re-read to be sure. Here is some offical writing about getting video out of the PICO - <a href="https://github.com/raspberrypi/pico-extras/tree/master/src/common/pico_scanvideo">https://github.com/raspberrypi/pico-extras/tree/master/src/common/pico_scanvideo</a>. Here is the official hardware design manual for the RP2040 - <a href="https://datasheets.raspberrypi.com/rp2040/hardware-design-with-rp2040.pdf">https://datasheets.raspberrypi.com/rp2040/hardware-design-with-rp2040.pdf</a> - and it is VERY beefy.</p>
+<p>I know at some point I wanted to figure out what the deal is on illegal, or undocumented, opcodes. I found this very in-depth resource that deserves a second or third reading: <a href="https://www.masswerk.at/nowgobang/2021/6502-illegal-opcodes">https://www.masswerk.at/nowgobang/2021/6502-illegal-opcodes</a>.</p>
+<p>I initially wondered if there was a way to make use of the second core on the PICO. I did some googling to determine that the PICO is every more intersting than something that has an OS because everything is essentially running on the bare metal, or at least the abstraction that an OS provides is not there. This is all to say that running software at such a low level has the potential to squeeze more performance out of the already-limited hardware. And so I wondered aloud, &quot;Could I utilize multicore programming in my emulator?&quot;</p>
+<p><a href="https://forums.nesdev.org/viewtopic.php?t=8999">https://forums.nesdev.org/viewtopic.php?t=8999</a> - Here is a forum post discussing the possibility of using multithreaded programming to emulator the 6502 and PPU on different cores, which inspired me to essentially imagine multithreading the 6502 and the PPU. It also pushed me towards doing a full-blown NES emulator instead of just a 6502, or some other 6502-based system.</p>
+<p><a href="https://www.electrosoftcloud.com/en/multithreaded-script-on-raspberry-pi-pico-and-micropython/">https://www.electrosoftcloud.com/en/multithreaded-script-on-raspberry-pi-pico-and-micropython/</a>, <a href="https://circuitdigest.com/microcontroller-projects/dual-core-programming-on-raspberry-pi-pico-using-micropython">https://circuitdigest.com/microcontroller-projects/dual-core-programming-on-raspberry-pi-pico-using-micropython</a>, <a href="https://www.youtube.com/watch?v=7h6mTR0oNcg">https://www.youtube.com/watch?v=7h6mTR0oNcg</a> - here are some tutorials on multithreaded programming on the PICO I came across</p>
+<p>It was at this point that I began to realize that this idea of using cores in my emulator could actually be possible.</p>
+<p><a href="https://bugzmanov.github.io/nes_ebook/chapter_2.html">https://bugzmanov.github.io/nes_ebook/chapter_2.html</a> - Here is a guide to writing an NES emulator in RUST, I didn't read it but I'm just documenting that it exists</p>
+<p><a href="https://en.wikipedia.org/wiki/Ada_Lovelace#First_computer_program">https://en.wikipedia.org/wiki/Ada_Lovelace#First_computer_program</a> - I guess I wanted to remind myself of what Ada Lovelace did from computing, and I was surprised to see it is contentious. But I found inspiration in what everbody agrees upon: her vision for the general purpose computer</p>
+<p>In trying to learn more about the NES's PPU, I found this reddit post - <a href="https://www.reddit.com/r/EmuDev/comments/evu3u2/what_does_the_nes_ppu_actually_do/">https://www.reddit.com/r/EmuDev/comments/evu3u2/what_does_the_nes_ppu_actually_do/</a>. The answers pointed me to the nesdev wiki, and to this post specifically - <a href="https://www.nesdev.org/wiki/PPU_rendering">https://www.nesdev.org/wiki/PPU_rendering</a>. This other post seems relevant - <a href="https://www.nesdev.org/wiki/PPU_frame_timing">https://www.nesdev.org/wiki/PPU_frame_timing</a>. In googling the specs of the PPU, I found a link to this PDF - <a href="https://d1.amobbs.com/bbs_upload782111/files_28/ourdev_551332.pdf">https://d1.amobbs.com/bbs_upload782111/files_28/ourdev_551332.pdf</a> - which appears to be written by the author of another NES emulator and in great detail documents various aspects of the NES hardware and notably the PPU. This would likely be very helpful for writing a low-level NES emulator.</p>
+<p>That is the end of the archiving of tabs I have had open for the last two weeks. Here is some new stuff I am finding at the time of writing:</p>
+<p>Here is a Commodore 64 using a Pico-driven cartridge emulator - <a href="https://www.raspberrypi.com/news/commodore-64-raspberry-pi-pico-emulator/">https://www.raspberrypi.com/news/commodore-64-raspberry-pi-pico-emulator/</a> - which makes extensive use of the PIO state machines to avoid interrupting CPU instructions. This technique could be interesting in my own work, but I have to better understand the PIOs and how well they work with the Rust library.</p>
+<p>In looking at the sumary of the emulator-based gaming capabilities of the Pico - <a href="https://picockpit.com/raspberry-pi/gaming-on-the-raspberry-pi-pico/#NES_emulator">https://picockpit.com/raspberry-pi/gaming-on-the-raspberry-pi-pico/#NES_emulator</a> - I was disheartened to discover that there is already an 60 FPS high accuracy NES emulator on the PICO. However, following the link from that blog post to this forum post - <a href="https://forums.emulator-zone.com/index.php?threads/using-a-rasp-pico-board-to-emulate-nes.26986/">https://forums.emulator-zone.com/index.php?threads/using-a-rasp-pico-board-to-emulate-nes.26986/</a> - I then discovered the original YouTube video posted demonstrating the project - <a href="https://www.youtube.com/watch?v=_iFT6jDa9Ug">https://www.youtube.com/watch?v=_iFT6jDa9Ug</a>. Based on the video, the project is very impressive and clearly done by someone/some group that have an impressive understanding on the NES's hardware. But there has been no release of project details or source code ever, the only implementation details I could find were in the comments from the original poster, which read: &quot;Pico @ 250MHz - Our Lab wrote VGA, PS/2, Sound drivers and a C++ Emulator and APIs.  We used Pico C/C++ SDK and some resistors for VGA (8 bits per pixel) + RC filter for PDM sound pin. Everything on a breadboard.&quot; The best OP could offer was a promise to post project details soon, and a plea for comments to subscribe.</p>
+<p>Up until now I had thought I might be the first to port the NES to the PICO, but I see now that is not true. However, there is nothing wrong with standing on the shoulders of giants. And writing a Rust emulator for the Pico is likely to still be a first, and to be publicly posting the project details and open-sourcing all code will make it the first open-source NES emulator on the PICO. Again, being the first is not so important, especially when it's being the first person to do something so niche. But it is nice to put a spin on things, and I hope that my spin is still novel by the end of the project.</p>
+<p>There are posts on multiple forums by the same author of the NES PICO project, <a href="https://forums.raspberrypi.com/viewtopic.php?t=308644">here</a> <a href="https://forums.raspberrypi.com/viewtopic.php?t=308400">are</a> <a href="https://retropie.org.uk/forum/topic/30218/nes-emulation-on-a-rasp-pico-castlevania-demo/3">some</a>. And while there are certainely more, I'll only look further if I need specific inspiration on the direction to take the project.</p>
+<p>More interesting might be Ben Stragnell's emulator which was published shortly after the PICO was released in the first place - <a href="https://www.hackster.io/news/ben-stragnell-gets-super-mario-bros-running-on-the-raspberry-pi-pico-in-a-custom-nes-emulator-6dfcc3533ee7">https://www.hackster.io/news/ben-stragnell-gets-super-mario-bros-running-on-the-raspberry-pi-pico-in-a-custom-nes-emulator-6dfcc3533ee7</a>. Here is the gameplay demo linked by the article - <a href="https://twitter.com/bstragnell/status/1356641834143895552">https://twitter.com/bstragnell/status/1356641834143895552</a>. Audio and video appear to work great. This emulator is apparently written in mostly C and asm, and runs with the PR2040 <strong>at half it's default clock speed.</strong> Wow.</p>
+<p>In his twitter announcement / video demo, Stragnell talks about using &quot;Bit Banging&quot; VGA and PWM signals for audio/video. Should look more into this.</p>
+<p>Here is a VERY recent Pico NES emulator that designed to be used with a demo board which supports digital video output - <a href="https://github.com/fhoedemakers/pico-infonesPlus">https://github.com/fhoedemakers/pico-infonesPlus</a>. This emulator requires the Pico to be overclocked in order to run full speed, but it's the first example of posted source code I've found.</p>
+<p>Looks like there is also some work going on in Japan, though it is hard to parse details - <a href="https://twitter.com/claude1079/status/1477888723018829825?lang=en">https://twitter.com/claude1079/status/1477888723018829825?lang=en</a></p>
+<p>Some other thing called the RetroVGA - <a href="https://www.hackster.io/news/peter-misenko-s-retrovga-is-a-compact-raspberry-pi-pico-powered-retro-emulation-marvel-3f1cbdd635f7">https://www.hackster.io/news/peter-misenko-s-retrovga-is-a-compact-raspberry-pi-pico-powered-retro-emulation-marvel-3f1cbdd635f7</a> - which runs a ported verison of MCUME.</p>
+<p>Here is more of the &quot;bit banging,&quot; this time with a published package for getting DVI out of the PICO - <a href="https://github.com/Wren6991/PicoDVI">https://github.com/Wren6991/PicoDVI</a></p>
+<p>Here are some thoughts:</p>
+<p>There is a mature VGA library for the Pico - <a href="https://www.breatharian.eu/hw/picovga/index_en.html">https://www.breatharian.eu/hw/picovga/index_en.html</a>. I initially found it on this hackaday post - <a href="https://hackaday.com/2021/06/11/vga-library-for-the-raspberry-pi-pico/">https://hackaday.com/2021/06/11/vga-library-for-the-raspberry-pi-pico/</a> - which features the following comments in the comment sections:</p>
+<p>&quot;regular pee can output VGA with just a resistor ladder, its called Gert VGA 666&quot;</p>
+<p>&quot;My regular pee can old output a standard stream of lightly colored liquid&quot; </p>
+<p>I also found a comment from the picovga library author talking about a new library designed to be a tutorial for working with DMA and PIO - <a href="http://www.breatharian.eu/hw/picoqvga/index_en.html">http://www.breatharian.eu/hw/picoqvga/index_en.html</a> - It seems that many microcomputer's have video hardware, and the Pico does not (which makes sense). So in order to get video out, you have to emulator that video hardwarer in software. This VGA package uses up one of the cores to render the video and allows the other core to run code that feeds video output. My concern is that Rust is designed to do multithreaded code in a way that is incompatiblle with this library. I don't understand how code can be assigned to a specific core as the library describes, but this this seems at odds with Dylan's description of how multithreading works in Rust (where is is handled automatically by Rust). So is this a hiccup, can I actually just run this code wrapped in Rust, do I need to port it, or do I need to write my own vide out entirely? It's possible this library would be overkill even if I was using C/C++.</p>
+<p>All things considered, people are getting video out of the Pico using Rust - <a href="https://twitter.com/therealjpster/status/1469625627766624260">https://twitter.com/therealjpster/status/1469625627766624260</a> - or at least have been since late 2021 with the release of &quot;pio&quot; crate which adds support of the RP2040's PIO state machines. So I should be able to get video out one way or another, but it might not be as simple as using a pre-existing package like picovga.</p>
+<p>The picovga package uses 8 bit <a href="https://en.wikipedia.org/wiki/List_of_monochrome_and_RGB_color_formats#8-bit_RGB_(also_known_as_3-3-2_bit_RGB_and_8-8-4_bit_RGB)">VGA</a> (3:3:2), which is a wider color space than the <a href="https://en.wikipedia.org/wiki/List_of_video_game_console_palettes#NES">NES</a> can output so that works out nicely.</p>
+<p>The same insane person doing pico graphics in rust also has a project called the <a href="https://neotron-compute.github.io/Neotron-Book/neotron_pico.html">Neutron Pico</a>, which is one of a couple different microcontroller-based computers. He designed an OS that is supposed to be shared between them, or something like that. </p>
+<p>In conclusion, checkout the picoqvga tutorial above.</p>
+
+        </div>
+
+                </div>
+            
+                <div class="post on-list">
+                    
+    <h1 class="post-title"><a href="https://willm.how/blog/thoughts-2022-10-26/">Thesis Meeting: 2022-10-26</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-10-26
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis/">#thesis</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis-meeting/">#thesis-meeting</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/rust/">#rust</a></span>
+    
+
+                    
+        <div class="post-content">
+            <p>Things to worry about later:</p>
+<ul>
+<li>Clock</li>
+<li>interupts </li>
+</ul>
+<p>When a binary is on disk, it is not ready to run. And it needs to be linked to the appropriate libraries on the system it is going to be running on.</p>
+<p>When you do <code>nm</code> on a library, you see all the places that it calls out. It also shows all the symbols that you need to get into it. All these symbols are function calls, and what they refer to is the location in memory of that function's starting address. They can also be global variables. They are just adresses in memory of functions or data structures.</p>
+<p>There are shared libraries and dynamic libraries:</p>
+<ol>
+<li>On a linux system, most of the big libraries are shared. This is done to save memory. Read-only data might as well be shared between programs (ex. C standard libraries). It is a lot of work to make sure everyone knows where the location of the data is.</li>
+<li>Back when memory was really scarce, you wouldn't want to load things into memory before you needed it.</li>
+</ol>
+<p>By default, Rust uses static linking. A rust binary has all the stuff it uses included in the binary.</p>
+
+        </div>
+
+                </div>
+            <div class="pagination">
+                <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://willm.how/blog/page/2/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Newer posts</span>
+                        </a>
+                    </span>
+                
+                    <span class="button next">
+                        <a href="https://willm.how/blog/page/4/">
+                            <span class="button__text">Older posts</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright copyright--user">&#169;&nbsp;<b>2022 Will Howes</b></div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

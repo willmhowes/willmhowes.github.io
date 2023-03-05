@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Will Howes</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://willm.how/blog/style.css">
+    <link rel="stylesheet" href="https://willm.how/blog/color/blue.css">
+
+    <link rel="stylesheet" href="https://willm.how/blog/font-hack-subset.css">
+
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://willm.how/blog" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            willm.how
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://willm.how/blog">blog</a></li>
+            
+                <li><a href="https://willm.how/blog/tags">tags</a></li>
+            
+                <li><a href="https://willm.how/blog/archive">archive</a></li>
+            
+                <li><a href="https://willm.how/blog/about">about me</a></li>
+            
+                <li><a href="https://github.com/willmhowes" target="_blank" rel="noopener noreferrer">github</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://willm.how/blog/thoughts-2022-11-13/">Thesis Thoughts: Assembly and Decoding</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-11-13
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis/">#thesis</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis-thoughts/">#thesis-thoughts</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/python/">#python</a></span>
+    
+
+        
+        <div class="post-content">
+            <p>I installed <a href="http://www.floodgap.com/retrotech/xa/">xa65</a>. There was a convenient brew formula I used to install it. My goal was to write a 6502 program and the decode it in Python.</p>
+<p>It then occured to me that I can't see the state of the memory or the registers if I'm cross-compiling (or cross-assembling?) 6502 code to my own machine. How would I would I be able to tell if the program I was running even did what I was telling it to do? This led me to seek out a proper 6502 emulator, which is how I found Nick Morgan's <a href="https://skilldrick.github.io/easy6502/">Easy 6502</a> tutorial. It conveniently features a javascript-based 6502 emulator complete with memory and register monitoring, as well as a hexdump feature which gives the 6502 machine code after it has been assembled.</p>
+<p>I wrote the following program:</p>
+<pre data-lang="asm" style="background-color:#151515;color:#e8e8d3;" class="language-asm "><code class="language-asm" data-lang="asm"><span style="color:#888888;">; countdown.6502.asm
+</span><span style="color:#888888;">; by Will Howes
+</span><span style="color:#888888;">;
+</span><span style="color:#888888;">; counts down from 10 to zero and stores each count in memory
+</span><span style="color:#fad07a;">LDX #</span><span>$10</span><span style="color:#888888;">    ; x = 0x10
+</span><span style="color:#fad07a;">LDY #</span><span>10</span><span style="color:#888888;">     ; y = 0x0a
+</span><span>
+</span><span style="color:#8fbfdc;">loop</span><span style="color:#fad07a;">:
+</span><span style="color:#fad07a;">STY </span><span>$00, </span><span style="color:#fad07a;">X</span><span style="color:#888888;">  ; write y to memory[x]
+</span><span style="color:#fad07a;">INX</span><span style="color:#888888;">         ; x++
+</span><span style="color:#fad07a;">DEY</span><span style="color:#888888;">         ; y--
+</span><span style="color:#fad07a;">CPY #</span><span>00</span><span style="color:#888888;">     ; z = 1 if y == 0 else 0
+</span><span style="color:#fad07a;">BNE </span><span style="color:#8fbfdc;">loop</span><span style="color:#888888;">    ; if z != 1 then branch loop
+</span></code></pre>
+<p>which amounts to the following hexdump:</p>
+<pre data-lang="asm" style="background-color:#151515;color:#e8e8d3;" class="language-asm "><code class="language-asm" data-lang="asm"><span>0600</span><span style="color:#fad07a;">: a2 </span><span>10 </span><span style="color:#fad07a;">a0 0a </span><span>94 00 </span><span style="color:#fad07a;">e8 </span><span>88 </span><span style="color:#fad07a;">c0 </span><span>00 </span><span style="color:#fad07a;">d0 f8
+</span></code></pre>
+<p>I found <a href="http://www.emulator101.com/6502-addressing-modes.html">this</a> page about the 6502's addressing modes to be a very useful reference when programming. Now, to get down to business, I used <a href="https://www.masswerk.at/6502/6502_instruction_set.html">this</a> opcode reference and wrote the following program:</p>
+<pre data-lang="python" style="background-color:#151515;color:#e8e8d3;" class="language-python "><code class="language-python" data-lang="python"><span style="color:#888888;"># Disco5.py
+</span><span style="color:#888888;"># 6502 hexdump Decoder
+</span><span style="color:#888888;"># Author: Will Howes
+</span><span>
+</span><span style="color:#ffb964;">VERBOSE </span><span>= False
+</span><span>
+</span><span>a = </span><span style="color:#cf6a4c;">0
+</span><span>x = </span><span style="color:#cf6a4c;">0
+</span><span>y = </span><span style="color:#cf6a4c;">0
+</span><span>z = </span><span style="color:#cf6a4c;">0
+</span><span>pc = None
+</span><span>memory = [</span><span style="color:#cf6a4c;">0 </span><span style="color:#8fbfdc;">for </span><span>x </span><span style="color:#8fbfdc;">in </span><span style="color:#ffb964;">range</span><span>(</span><span style="color:#cf6a4c;">1000</span><span>)]
+</span><span>
+</span><span style="color:#888888;"># TODO:
+</span><span style="color:#888888;"># - store system registers in their own list
+</span><span style="color:#888888;"># - figure out a system for ending runtime
+</span><span style="color:#888888;"># - make so that end of program is when pc reaches end of memory
+</span><span style="color:#888888;">#   or illegal opcode
+</span><span style="color:#888888;"># - interactive debugger (run one instruction at a time and set a
+</span><span style="color:#888888;">#   keypress which)
+</span><span style="color:#888888;">#   engages a memory dump or register dump
+</span><span style="color:#888888;"># - BE SURE TO WRITE WITH TESTS
+</span><span style="color:#888888;"># - implement more opcodes
+</span><span>
+</span><span style="color:#8fbfdc;">def </span><span style="color:#fad07a;">lb </span><span>(</span><span style="color:#ffb964;">memory</span><span>, </span><span style="color:#ffb964;">pc</span><span>):
+</span><span>    </span><span style="color:#8fbfdc;">return </span><span>memory[pc], pc+</span><span style="color:#cf6a4c;">1
+</span><span>
+</span><span style="color:#8fbfdc;">def </span><span style="color:#fad07a;">ubyte_to_sbyte</span><span>(</span><span style="color:#ffb964;">b</span><span>):
+</span><span>    </span><span style="color:#888888;"># pad to 8
+</span><span>    </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">len</span><span>(b) &lt; </span><span style="color:#cf6a4c;">8</span><span>:
+</span><span>        b = </span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">0</span><span style="color:#556633;">&#39;</span><span>*(</span><span style="color:#cf6a4c;">8</span><span>-</span><span style="color:#ffb964;">len</span><span>(b)) + b
+</span><span>    </span><span style="color:#8fbfdc;">if </span><span>b[</span><span style="color:#cf6a4c;">0</span><span>] == </span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">1</span><span style="color:#556633;">&#39;</span><span>:
+</span><span>        inv_b = </span><span style="color:#556633;">&#39;&#39;</span><span>.</span><span style="color:#ffb964;">join</span><span>([(</span><span style="color:#8fbfdc;">lambda </span><span style="color:#ffb964;">x</span><span>: </span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">0</span><span style="color:#556633;">&#39; </span><span style="color:#8fbfdc;">if </span><span>x==</span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">1</span><span style="color:#556633;">&#39; </span><span style="color:#8fbfdc;">else </span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">1</span><span style="color:#556633;">&#39;</span><span>)(bit) </span><span style="color:#8fbfdc;">for </span><span>bit </span><span style="color:#8fbfdc;">in </span><span>b])
+</span><span>        twocomp = </span><span style="color:#ffb964;">int</span><span>(inv_b,</span><span style="color:#cf6a4c;">2</span><span>) + </span><span style="color:#cf6a4c;">1
+</span><span>        </span><span style="color:#8fbfdc;">return </span><span>-twocomp
+</span><span>    </span><span style="color:#8fbfdc;">return </span><span style="color:#ffb964;">int</span><span>(b,</span><span style="color:#cf6a4c;">2</span><span>)
+</span><span>
+</span><span style="color:#8fbfdc;">def </span><span style="color:#fad07a;">test_ubyte</span><span>():
+</span><span>    </span><span style="color:#8fbfdc;">assert</span><span>(</span><span style="color:#ffb964;">ubyte_to_sbyte</span><span>(</span><span style="color:#ffb964;">bin</span><span>(</span><span style="color:#cf6a4c;">255</span><span>)[</span><span style="color:#cf6a4c;">2</span><span>:]) == -</span><span style="color:#cf6a4c;">1</span><span>)
+</span><span>    </span><span style="color:#8fbfdc;">assert</span><span>(</span><span style="color:#ffb964;">ubyte_to_sbyte</span><span>(</span><span style="color:#ffb964;">bin</span><span>(</span><span style="color:#cf6a4c;">127</span><span>)[</span><span style="color:#cf6a4c;">2</span><span>:]) == </span><span style="color:#cf6a4c;">127</span><span>)
+</span><span>    </span><span style="color:#8fbfdc;">assert</span><span>(</span><span style="color:#ffb964;">ubyte_to_sbyte</span><span>(</span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">11111000</span><span style="color:#556633;">&#39;</span><span>) == -</span><span style="color:#cf6a4c;">8</span><span>)
+</span><span>
+</span><span style="color:#8fbfdc;">with </span><span style="color:#ffb964;">open</span><span>(</span><span style="color:#556633;">&#39;</span><span style="color:#99ad6a;">countdown.txt</span><span style="color:#556633;">&#39;</span><span>) </span><span style="color:#8fbfdc;">as </span><span>f:
+</span><span>    lines = f.</span><span style="color:#ffb964;">readlines</span><span>()
+</span><span>
+</span><span>    </span><span style="color:#888888;"># only works for one line currently
+</span><span>    </span><span style="color:#8fbfdc;">for </span><span>line </span><span style="color:#8fbfdc;">in </span><span>lines:
+</span><span>        hexdump = line.</span><span style="color:#ffb964;">split</span><span>()
+</span><span>        loc = </span><span style="color:#ffb964;">int</span><span>(hexdump[</span><span style="color:#cf6a4c;">0</span><span>][:-</span><span style="color:#cf6a4c;">1</span><span>])
+</span><span>        </span><span style="color:#8fbfdc;">if </span><span>pc == None:
+</span><span>            pc = loc
+</span><span>        </span><span style="color:#888888;"># write instructions to memory
+</span><span>        </span><span style="color:#8fbfdc;">for </span><span>instr </span><span style="color:#8fbfdc;">in </span><span>hexdump[</span><span style="color:#cf6a4c;">1</span><span>:]:
+</span><span>            memory[loc] = </span><span style="color:#ffb964;">int</span><span>(instr, </span><span style="color:#cf6a4c;">16</span><span>)
+</span><span>            loc += </span><span style="color:#cf6a4c;">1
+</span><span>
+</span><span>    </span><span style="color:#8fbfdc;">while </span><span>pc &lt; </span><span style="color:#ffb964;">len</span><span>(memory):
+</span><span>        instruction, pc = </span><span style="color:#ffb964;">lb</span><span>(memory,pc)
+</span><span>        </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#ffb964;">hex</span><span>(instruction))
+</span><span>
+</span><span>        match instruction:
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0xa2</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">LDX</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                x, pc = </span><span style="color:#ffb964;">lb</span><span>(memory,pc)
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0xa0</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">LDY</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                y, pc = </span><span style="color:#ffb964;">lb</span><span>(memory,pc)
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0x94</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">STY</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                zpg, pc = </span><span style="color:#ffb964;">lb</span><span>(memory,pc)
+</span><span>                memory[zpg + x] = y
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0xe8</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">INX</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                x+=</span><span style="color:#cf6a4c;">1
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0x88</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">DEY</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                y-=</span><span style="color:#cf6a4c;">1
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0xc0</span><span>):
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">CPY, Immediate</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>                val, pc = </span><span style="color:#ffb964;">lb</span><span>(memory, pc)
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span>y == val: z = </span><span style="color:#cf6a4c;">1
+</span><span>                </span><span style="color:#8fbfdc;">else</span><span>:        z = </span><span style="color:#cf6a4c;">0
+</span><span>            case </span><span style="color:#ffb964;">int</span><span>(</span><span style="color:#cf6a4c;">0xd0</span><span>):
+</span><span>                offset, pc = </span><span style="color:#ffb964;">lb</span><span>(memory, pc)
+</span><span>                offset = </span><span style="color:#ffb964;">bin</span><span>(offset)[</span><span style="color:#cf6a4c;">2</span><span>:]
+</span><span>                offset = </span><span style="color:#ffb964;">ubyte_to_sbyte</span><span>(offset)
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span>z == </span><span style="color:#cf6a4c;">0</span><span>:
+</span><span>                    pc += offset
+</span><span>                </span><span style="color:#8fbfdc;">if </span><span style="color:#ffb964;">VERBOSE</span><span>: </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">BNE:</span><span style="color:#556633;">&quot;</span><span>, offset, z)
+</span><span>
+</span><span>    </span><span style="color:#888888;"># print section of memory with results
+</span><span>    </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">-----</span><span style="color:#556633;">&quot;</span><span>)
+</span><span>    </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">0010: </span><span style="color:#7697d6;">{}</span><span style="color:#556633;">&quot;</span><span>.</span><span style="color:#ffb964;">format</span><span>(memory[</span><span style="color:#cf6a4c;">16</span><span>:</span><span style="color:#cf6a4c;">32</span><span>]))
+</span><span>    </span><span style="color:#ffb964;">print</span><span>(</span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">-----</span><span style="color:#556633;">&quot;</span><span>)
+</span></code></pre>
+<p>The decoder is called &quot;disco5&quot; because it sounds cool.</p>
+<p>There is more to say about the program and how it works, but I will have to come back to add more later.</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Thanks for reading! Read other posts?</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://willm.how/blog/thoughts-2022-11-06/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Thesis Thoughts: Brain Dump</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://willm.how/blog/site-notes/">
+                            <span class="button__text">Automated static site generation with Dreamhost and Zola</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright copyright--user">&#169;&nbsp;<b>2022 Will Howes</b></div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

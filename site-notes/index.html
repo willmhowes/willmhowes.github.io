@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Will Howes</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://willm.how/blog/style.css">
+    <link rel="stylesheet" href="https://willm.how/blog/color/blue.css">
+
+    <link rel="stylesheet" href="https://willm.how/blog/font-hack-subset.css">
+
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://willm.how/blog" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            willm.how
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://willm.how/blog">blog</a></li>
+            
+                <li><a href="https://willm.how/blog/tags">tags</a></li>
+            
+                <li><a href="https://willm.how/blog/archive">archive</a></li>
+            
+                <li><a href="https://willm.how/blog/about">about me</a></li>
+            
+                <li><a href="https://github.com/willmhowes" target="_blank" rel="noopener noreferrer">github</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://willm.how/blog/site-notes/">Automated static site generation with Dreamhost and Zola</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-11-14
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/rust/">#rust</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/ssg/">#ssg</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/zola/">#zola</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/dreamhost/">#dreamhost</a></span>
+    
+
+        
+        <div class="post-content">
+            <h1 id="backstory">Backstory</h1>
+<p>I had been squatting on the <a href="https://willm.how">willm.how</a> domain for a number of months until today I decided to finally put it to use. I skimmed through the <a href="https://jamstack.org/generators/">jamstack</a> static site generator list as I do everytime I think about starting a blog, staring down a sea of javascript-backends. When I spotted <a href="https://www.getzola.org/">Zola</a>, a static site generator that uses rust on the back-end (woo-hoo), I had a feeling this attempt might be different. An hour or two later, my blog was live! Quickly, the real challenge revealed itself: whether or not I would be able to automate deployment of the statically-generated site using only my dreamhost server, a shared tier on which I do NOT have root access (Spoiler: it not only possible, it's also pretty straightforward).</p>
+<h1 id="binary-trickery-and-bash-scripting">Binary trickery and bash scripting</h1>
+<p>My initial hurdle was not knowing how I would run Zola's build process without installing it on the server. I considered integrating GitHub Actions, but the learning curve for that seemed too high for what I was trying to do. Then, I read <a href="https://help.dreamhost.com/hc/en-us/articles/216994417-Is-root-sudo-access-available-">here</a> that I can just run a binary from the home folder of the server.</p>
+
+  <img src="homer_doh.jpg" alt="Homer Simpson smacking his head and saying &#x27;doh&#x27;" class="center" />
+
+<p>I copied <a href="https://github.com/getzola/zola/releases/tag/v0.14.0">this</a> tarball onto the server. I had to use an older version because of an <a href="https://github.com/chrismaltby/gb-studio/issues/1083">incompatibility</a> between the particular linux image used by Dreamhost shared servers and the precompiled binary provided by Zola. In theory, this issue resolves if I compile the binary myself but I'm okay running the old binary for now.</p>
+<p>After I SSH'd into the server, I extracted the tarball with <code>tar -xvzf zola-v0.14.0-x86_64-unknown-linux-gnu.tar.gz</code>, a command I sourced from <a href="https://phoenixnap.com/kb/extract-tar-gz-files-linux-command-line">here</a>. I then used <a href="https://help.dreamhost.com/hc/en-us/articles/216445197-Pushing-your-local-Git-repository-to-a-DreamHost-server-Linux-Mac-OS-X">this</a> dreamhost blog post to setup a git repository on the server that was ready to receive the repository I had on my laptop. While I was at it, I followed <a href="https://jigarius.com/blog/multiple-git-remote-repositories">this</a> blog post to configure git-remote to be able to push to both my server and a GitHub repository in one command.</p>
+<p>Then I wrote the following bash script, called compile.sh:</p>
+<pre data-lang="bash" style="background-color:#151515;color:#e8e8d3;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;">#!/bin/bash
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/
+</span><span>echo </span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">Refreshing clone...</span><span style="color:#556633;">&quot;
+</span><span style="color:#ffb964;">rm -rf ~</span><span>/clone.willm.how.git
+</span><span style="color:#ffb964;">mkdir ~</span><span>/clone.willm.how.git
+</span><span style="color:#ffb964;">git</span><span> clone </span><span style="color:#ffb964;">~</span><span>/willm.how.git </span><span style="color:#ffb964;">~</span><span>/clone.willm.how.git/
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/clone.willm.how.git/
+</span><span style="color:#ffb964;">../zola</span><span> build</span><span style="color:#ffb964;"> -o ~</span><span>/willm.how
+</span><span style="color:#ffb964;">rm -rf ~</span><span>/clone.willm.how.git
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/
+</span></code></pre>
+<p>The script just clones the repo into a folder, runs the Zola build command, and then removes the clone folder. The clone folder is necessary because the repository does not automatically have a directory associated with it here. We call the directory associated with a repository a <a href="https://craftquest.io/articles/what-is-the-working-tree-in-git">working tree</a> . I ran <code>chmod u+x compile.sh</code> to make the script executable, and it worked just as I had hoped! This was exciting for me because I can honestly say I've never written a bash script that was actually useful to me until now. I was satisfied with the progress I had made, and I would be okay to manually run compile.sh after every push. But it would be that much better if I could have the server to run the script for me...</p>
+<h1 id="god-bless-git-hooks">God bless git hooks</h1>
+<p>In my research I had come across <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks">git hooks</a>, but I was only coming across hooks that were triggered on push (client-side) when what I needed was a hook that triggered on receipt of a push (server-side). I found <a href="https://stackoverflow.com/questions/32053967/git-automatically-run-bash-script-on-the-server-after-any-client-pushes">this</a> stack overflow post and followed its link to <a href="https://www.digitalocean.com/community/tutorials/how-to-set-up-automatic-deployment-with-git-with-a-vps">this</a> DigitalOcean tutorial on git-based site deployment automation. It was here that I discovered the existence of the lovely post-receive hook. I ran <code>touch post-receive</code> inside the .git/hooks/ directory. The code inside post-receive looks like this:</p>
+<pre data-lang="bash" style="background-color:#151515;color:#e8e8d3;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;">#!/bin/bash
+</span><span style="color:#ffb964;">~/compile.sh
+</span></code></pre>
+<p>because all it does is run the script I wrote above. I could just keep the code from compile.sh inside the post-receive hook, but if I ever want to manually run compile.sh it will be fewer keystrokes to run from the home folder rather than inside the hooks folder of a git repo (I imagine someone who knows better than me is screaming at their monitor about how poorly organized my files are, feel free to email me at <a href="mailto:me@willm.how">me@willm.how</a> with your suggestions). After this, I was finished before you can say <code>chmod u+x post-receive</code> three times fast.</p>
+<p>I euthanized a stray .DS_Store in order to change the state of the repository and pushed the change to both remotes, and bada-bing bada-boom, the push triggered a Zola build like I had hoped for. I hope someone else confused about what can you and cannot do with a Dreamhost shared hosting plan finds themselves as pleased as I am.</p>
+<p>Thank you to <a href="https://robinforest.net/post/hugo-questions/">this</a> article for inspiration.</p>
+<h1 id="future-improvements">Future Improvements</h1>
+<ol>
+<li>Improve the accessibility of the theme's HTML with ARIA tags. It's also possible the current theme is poor for accessibility so there is probably work to be done there. Using the <a href="https://wave.webaim.org/">WAVE</a> tools should help.</li>
+<li>The DigitalOcean article above sets out an interesting way of staging beta and live sites changes, and it should be easy enough to replicate this process on a seperate subdomain.</li>
+<li>I realized that I should be able to add zola to the $PATH variable on my server, which would make it easier to invoke because I wouldn't have to locate the binary before running it. Of course, it's just in the home folder but I digress.</li>
+<li><a href="https://www.getzola.org/documentation/getting-started/installation/#from-source">Compile</a> the zola binary for the server</li>
+</ol>
+<h1 id="update-2022-11-15">Update - 2022-11-15</h1>
+<p>I updated compile.sh to read as follows:</p>
+<pre data-lang="bash" style="background-color:#151515;color:#e8e8d3;" class="language-bash "><code class="language-bash" data-lang="bash"><span style="color:#888888;">#!/bin/bash
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/
+</span><span>echo </span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">Refreshing clone...</span><span style="color:#556633;">&quot;
+</span><span style="color:#ffb964;">rm -rf ~</span><span>/clone.willm.how.git
+</span><span style="color:#ffb964;">mkdir ~</span><span>/clone.willm.how.git
+</span><span style="color:#ffb964;">git</span><span> clone </span><span style="color:#ffb964;">~</span><span>/willm.how.git </span><span style="color:#ffb964;">~</span><span>/clone.willm.how.git/
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/clone.willm.how.git/
+</span><span style="color:#ffb964;">../zola</span><span> build</span><span style="color:#ffb964;"> -o ~</span><span>/willm.how/blog/
+</span><span style="color:#ffb964;">rm -rf ~</span><span>/clone.willm.how.git
+</span><span>cd </span><span style="color:#ffb964;">~</span><span>/
+</span></code></pre>
+<p>You'll notice the only change is that Zola builds the site into a subdirectory of the willm.how directory. This is simply to make it so that my blog live inside a &quot;blog&quot; slug when a user visits the website. I just like the way it looks. The only other change to ensure that Zola compiled properly is to update the base_url variable in config.toml to include the new slug. With that, everything worked as I wanted. However, if somebody goes to just https://willm.how, they would find nothing. So I added the following index.html to the root directory of the site:</p>
+<pre data-lang="html" style="background-color:#151515;color:#e8e8d3;" class="language-html "><code class="language-html" data-lang="html"><span>&lt;!DOCTYPE html&gt;
+</span><span>&lt;</span><span style="color:#ffb964;">html</span><span>&gt;
+</span><span>   &lt;</span><span style="color:#ffb964;">head</span><span>&gt;
+</span><span>      &lt;</span><span style="color:#ffb964;">title</span><span>&gt;HTML Meta Tag&lt;/</span><span style="color:#ffb964;">title</span><span>&gt;
+</span><span>      &lt;</span><span style="color:#ffb964;">meta http-equiv </span><span>= </span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">refresh</span><span style="color:#556633;">&quot; </span><span style="color:#ffb964;">content </span><span>= </span><span style="color:#556633;">&quot;</span><span style="color:#99ad6a;">0; url = https://willm.how/blog</span><span style="color:#556633;">&quot; </span><span>/&gt;
+</span><span>   &lt;/</span><span style="color:#ffb964;">head</span><span>&gt;
+</span><span>   &lt;</span><span style="color:#ffb964;">body</span><span>&gt;
+</span><span>      &lt;</span><span style="color:#ffb964;">p</span><span>&gt;Redirecting to another URL&lt;/</span><span style="color:#ffb964;">p</span><span>&gt;
+</span><span>   &lt;/</span><span style="color:#ffb964;">body</span><span>&gt;
+</span><span>&lt;/</span><span style="color:#ffb964;">html</span><span>&gt;
+</span></code></pre>
+<p><a href="https://www.tutorialspoint.com/How-to-automatically-redirect-a-Web-Page-to-another-URL">This</a> is a simple HTML file which redirects the user directly the blog page. In the future I intend to have a better landing site, but a simple redirect will do for now.</p>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Thanks for reading! Read other posts?</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://willm.how/blog/thoughts-2022-11-13/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Thesis Thoughts: Assembly and Decoding</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://willm.how/blog/thoughts-2022-11-17/">
+                            <span class="button__text">Thesis Thoughts: Signed&#x2F;Unsigned casting in Rust</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright copyright--user">&#169;&nbsp;<b>2022 Will Howes</b></div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>

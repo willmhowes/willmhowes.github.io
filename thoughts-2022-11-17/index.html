@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Will Howes</title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="robots" content="noodp"/>
+
+    <link rel="stylesheet" href="https://willm.how/blog/style.css">
+    <link rel="stylesheet" href="https://willm.how/blog/color/blue.css">
+
+    <link rel="stylesheet" href="https://willm.how/blog/font-hack-subset.css">
+
+        <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    
+    </head>
+
+<body class="">
+<div class="container">
+    
+    <header class="header">
+        <div class="header__inner">
+            <div class="header__logo">
+                    
+                <a href="https://willm.how/blog" style="text-decoration: none;">
+                    <div class="logo">
+                      
+                            willm.how
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        
+        
+                <nav class="menu">
+            <ul class="menu__inner">
+                <li class="active"><a href="https://willm.how/blog">blog</a></li>
+            
+                <li><a href="https://willm.how/blog/tags">tags</a></li>
+            
+                <li><a href="https://willm.how/blog/archive">archive</a></li>
+            
+                <li><a href="https://willm.how/blog/about">about me</a></li>
+            
+                <li><a href="https://github.com/willmhowes" target="_blank" rel="noopener noreferrer">github</a></li>
+            </ul>
+        </nav>
+    
+    
+        
+    </header>
+    
+
+    <div class="content">
+        
+    <div class="post">
+        
+    <h1 class="post-title"><a href="https://willm.how/blog/thoughts-2022-11-17/">Thesis Thoughts: Signed&#x2F;Unsigned casting in Rust</a></h1>
+    <div class="post-meta-inline">
+        
+    <span class="post-date">
+            2022-11-17
+        </span>
+
+    </div>
+
+    
+        <span class="post-tags-inline">
+                :: tags:&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis/">#thesis</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/thesis-thoughts/">#thesis-thoughts</a>&nbsp;
+                <a class="post-tag" href="https://willm.how/blog/tags/rust/">#rust</a></span>
+    
+
+        
+        <div class="post-content">
+            <h1 id="hex-woes">Hex woes</h1>
+<p>When emulating a 6502, a lot of what the emulator does is read in assembled 6502 binary as hex values. Some of these hex values represent signed integers. This poses a problem in so far as when rust reads in integers, it reads the number as unsigned even if the number is being read into a signed integer.</p>
+<p>For example, I was really struggling to get my code to read in 0xf8 as the signed value -8. Instead it was reading in the unsinged value of 248, AKA the binary string 11111000. Even if I specify the data type of the binary string as it enters rust (0xf8i8), it still treats it as unsigned and gives me the error that 248 is too large of a value for a signed 8 bit integer.</p>
+<p>The following code will error:</p>
+<pre data-lang="rust" style="background-color:#151515;color:#e8e8d3;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#8fbfdc;">fn </span><span style="color:#fad07a;">main</span><span>() {
+</span><span>    </span><span style="color:#8fbfdc;">let</span><span> x: </span><span style="color:#8fbfdc;">i8 </span><span>= </span><span style="color:#cf6a4c;">0xf8</span><span>;
+</span><span>    println!(</span><span style="color:#556633;">&quot;</span><span style="color:#7697d6;">{}</span><span style="color:#556633;">&quot;</span><span>, x);
+</span><span>}
+</span></code></pre>
+<p>as will this:</p>
+<pre data-lang="rust" style="background-color:#151515;color:#e8e8d3;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#8fbfdc;">fn </span><span style="color:#fad07a;">main</span><span>() {
+</span><span>    </span><span style="color:#8fbfdc;">let</span><span> x = </span><span style="color:#cf6a4c;">0xf8</span><span style="color:#8fbfdc;">i8</span><span>;
+</span><span>    println!(</span><span style="color:#556633;">&quot;</span><span style="color:#7697d6;">{}</span><span style="color:#556633;">&quot;</span><span>, x);
+</span><span>}
+</span></code></pre>
+<p>In both examples, the compiler gives the following notes:</p>
+<blockquote>
+<p>= note: <code>#[deny(overflowing_literals)]</code> on by default</p>
+<p>= note: the literal <code>0xf8i8</code> (decimal <code>248</code>) does not fit into the type <code>i8</code> and will become <code>-8i8</code></p>
+</blockquote>
+<p>This confirms my understanding outlined above. <strong>The rust compiler is treating what I intend to be a signed integer as a negative overflow in an unsigned integer.</strong></p>
+<p>Rats.</p>
+<h1 id="the-solution">The solution</h1>
+<p>I encountered the <a href="https://doc.rust-lang.org/rust-by-example/types/cast.html">casting</a> page of the Rust Book, and my woes were banished. According to the book:</p>
+<blockquote>
+<p>&quot;When casting to a signed type, the (bitwise) result is the same as first casting to the corresponding unsigned type. If the most significant bit of that value is 1, then the value is negative.&quot;</p>
+</blockquote>
+<p>Bingo! All I have to do is cast the u8 as i8.</p>
+<p>Here are my conclusions:</p>
+<pre data-lang="rust" style="background-color:#151515;color:#e8e8d3;" class="language-rust "><code class="language-rust" data-lang="rust"><span style="color:#8fbfdc;">fn </span><span style="color:#fad07a;">main</span><span>() {
+</span><span>    </span><span style="color:#8fbfdc;">let</span><span> x: </span><span style="color:#8fbfdc;">i8 </span><span>= -</span><span style="color:#cf6a4c;">8</span><span>; </span><span style="color:#888888;">// Rust has no problem reading in a negative decimal
+</span><span>    </span><span style="color:#8fbfdc;">let</span><span> y: </span><span style="color:#8fbfdc;">u8 </span><span>= </span><span style="color:#cf6a4c;">0xf8</span><span>; </span><span style="color:#888888;">// Rust assumes hex and binary literals to be unsigned
+</span><span>    println!(</span><span style="color:#556633;">&quot;</span><span style="color:#7697d6;">{0:b} {0}</span><span style="color:#556633;">&quot;</span><span>, x);
+</span><span>    println!(</span><span style="color:#556633;">&quot;</span><span style="color:#7697d6;">{0:b} {0}</span><span style="color:#556633;">&quot;</span><span>, y);
+</span><span>    </span><span style="color:#888888;">// only when we cast y as signed do we get our desired representation
+</span><span>    println!(</span><span style="color:#556633;">&quot;</span><span style="color:#7697d6;">{0:b} {0}</span><span style="color:#556633;">&quot;</span><span>, y as </span><span style="color:#8fbfdc;">i8</span><span>);
+</span><span>}
+</span><span>
+</span><span style="color:#888888;">// output:
+</span><span style="color:#888888;">// 11111000 -8
+</span><span style="color:#888888;">// 11111000 248
+</span><span style="color:#888888;">// 11111000 -8
+</span></code></pre>
+
+        </div>
+
+        
+        <div class="pagination">
+            <div class="pagination__title">
+                <span class="pagination__title-h">Thanks for reading! Read other posts?</span>
+                <hr />
+            </div>
+            <div class="pagination__buttons">
+                    <span class="button previous">
+                        <a href="https://willm.how/blog/site-notes/">
+                            <span class="button__icon">←</span>&nbsp;
+                            <span class="button__text">Automated static site generation with Dreamhost and Zola</span>
+                        </a>
+                    </span>
+                
+                
+                    <span class="button next">
+                        <a href="https://willm.how/blog/site-plans/">
+                            <span class="button__text">Web Hosting Is a Racket</span>&nbsp;
+                            <span class="button__icon">→</span>
+                        </a>
+                    </span>
+                </div>
+        </div>
+    
+    </div>
+
+    </div>
+
+    
+    <footer class="footer">
+        <div class="footer__inner">
+                <div class="copyright copyright--user">&#169;&nbsp;<b>2022 Will Howes</b></div>
+            </div>
+    </footer>
+    
+
+</div>
+</body>
+
+</html>
